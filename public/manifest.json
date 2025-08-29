@@ -1,0 +1,17 @@
+{
+  "name": "Reditto - Correção de Redação ENEM",
+  "short_name": "Reditto",
+  "description": "Plataforma inteligente para correção de redações ENEM com feedback detalhado e notas por competência",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#8B5CF6",
+  "icons": [
+    {
+      "src": "/logo reditto.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

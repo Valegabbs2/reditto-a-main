@@ -88,12 +88,10 @@ const Login = () => {
     
     try {
       if (isSignUp) {
-        const redirectUrl = `${window.location.origin}/`;
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            emailRedirectTo: redirectUrl,
             data: {
               display_name: name
             }
@@ -115,12 +113,33 @@ const Login = () => {
             });
           }
         } else {
-          toast({
-            title: "Conta criada!",
-            description: "Faça login para continuar."
-          });
-          setIsSignUp(false);
-          setName("");
+          // Se a conta foi criada com sucesso, fazer login automático
+          if (data?.user && !data?.user?.email_confirmed_at) {
+            // Tentar fazer login automático
+            const { error: signInError } = await supabase.auth.signInWithPassword({
+              email,
+              password
+            });
+            
+            if (signInError) {
+              toast({
+                title: "Conta criada!",
+                description: "Faça login para continuar."
+              });
+              setIsSignUp(false);
+              setName("");
+            } else {
+              toast({
+                title: "Conta criada com sucesso!",
+                description: "Bem-vindo ao Reditto!"
+              });
+            }
+          } else {
+            toast({
+              title: "Conta criada com sucesso!",
+              description: "Bem-vindo ao Reditto!"
+            });
+          }
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -175,9 +194,9 @@ const Login = () => {
         <div className="text-center space-y-6">
           <div className="flex justify-center">
             <img 
-              src="/lovable-uploads/2595bdc0-649f-4154-b6b0-31d1ebaa9f5a.png" 
+              src="/logo reditto.png" 
               alt="Reditto Logo" 
-              className="w-40 h-40 object-contain"
+              className="w-48 h-48 object-contain"
             />
           </div>
           <p className="text-sm text-muted-foreground">
