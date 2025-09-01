@@ -187,7 +187,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 flex items-center justify-center p-4">
-      <ThemeToggle />
       
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
@@ -207,6 +206,14 @@ const Login = () => {
         {!showEmailForm ? (
           /* Main Auth Options */
           <div className="space-y-4">
+            {/* Theme Toggle with Message */}
+            <div className="flex items-center justify-center gap-2 mb-4 border border-border rounded-md px-3 py-2 bg-background/50 backdrop-blur-sm">
+              <ThemeToggle />
+              <span className="text-xs text-muted-foreground">
+                ← Clique no ícone para alterar a cor do seu ambiente.
+              </span>
+            </div>
+
             {/* Email Sign In */}
             <div className="glass-card space-y-4">
               <Button 

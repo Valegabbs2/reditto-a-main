@@ -23,10 +23,10 @@ export const ThemeToggle = () => {
 
   return (
     <Button
-      variant="ghost"
+      variant="outline"
       size="sm"
       onClick={toggleTheme}
-      className="text-muted-foreground hover:text-foreground"
+      className="h-8 w-8 p-0 border-2 border-border hover:border-primary/50 transition-colors duration-200"
       aria-label="Toggle theme"
     >
       {theme === "light" ? (
