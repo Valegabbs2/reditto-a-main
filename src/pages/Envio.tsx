@@ -147,7 +147,7 @@ const Envio = () => {
         <div className="container mx-auto flex items-center justify-between max-w-6xl">
           <div className="flex items-center gap-3">
             <img 
-              src="/lovable-uploads/44d90491-4da9-432c-a1f3-53c75c8c9315.png" 
+              src="/assets/placeholder-image.png" 
               alt="Reditto Logo" 
               className="w-8 h-8 md:w-10 md:h-10 object-contain flex-shrink-0"
             />

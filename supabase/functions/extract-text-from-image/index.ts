@@ -30,7 +30,7 @@ serve(async (req) => {
       headers: {
         'Authorization': `Bearer ${openRouterApiKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://reditto.lovable.app',
+        'HTTP-Referer': 'https://reditto.vercel.app',
         'X-Title': 'Reditto - Correção de Redações'
       },
       body: JSON.stringify({

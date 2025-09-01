@@ -1,73 +1,91 @@
-# Welcome to your Lovable project
+# Reditto - Correção de Redações ENEM
 
-## Project info
+Plataforma inteligente para correção de redações ENEM com feedback detalhado e notas por competência.
 
-**URL**: https://lovable.dev/projects/dc954720-9c9d-47ee-a284-0b1c6c392748
+## 🚀 Sobre o Projeto
 
-## How can I edit this code?
+O Reditto é uma aplicação web desenvolvida para ajudar estudantes a melhorar suas redações do ENEM através de correções inteligentes e feedback detalhado por competência.
 
-There are several ways of editing your application.
+## ✨ Funcionalidades
 
-**Use Lovable**
+- **Correção Inteligente**: Análise automática de redações usando IA
+- **Feedback Detalhado**: Comentários específicos por competência
+- **Interface Moderna**: Design responsivo e intuitivo
+- **Tema Escuro/Claro**: Suporte a diferentes preferências visuais
+- **Upload de Imagens**: Possibilidade de enviar redações em formato de imagem
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dc954720-9c9d-47ee-a284-0b1c6c392748) and start prompting.
+## 🛠️ Tecnologias Utilizadas
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend**: React + TypeScript + Vite
+- **UI**: Tailwind CSS + Shadcn/ui
+- **Backend**: Supabase (Funções Edge)
+- **IA**: OpenRouter API
+- **Deploy**: Vercel
+- **Analytics**: Vercel Analytics
 
-**Use your preferred IDE**
+## 📦 Instalação
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. Clone o repositório:
+```bash
+git clone [URL_DO_REPOSITORIO]
+cd reditto-a-main
+```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+2. Instale as dependências:
+```bash
+npm install
+```
 
-Follow these steps:
+3. Configure as variáveis de ambiente:
+```bash
+# Crie um arquivo .env.local com as seguintes variáveis:
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anonima_do_supabase
+VITE_OPENROUTER_API_KEY=sua_chave_da_openrouter
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+4. Execute o projeto:
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## 🚀 Deploy
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+O projeto está configurado para deploy automático no Vercel. Para fazer deploy:
 
-**Use GitHub Codespaces**
+1. Conecte seu repositório ao Vercel
+2. Configure as variáveis de ambiente no painel do Vercel
+3. O deploy será feito automaticamente a cada push
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 📁 Estrutura do Projeto
 
-## What technologies are used for this project?
+```
+src/
+├── components/     # Componentes reutilizáveis
+├── pages/         # Páginas da aplicação
+├── hooks/         # Custom hooks
+├── lib/           # Utilitários
+└── integrations/  # Integrações externas (Supabase)
+```
 
-This project is built with:
+## 🤝 Contribuição
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+1. Faça um fork do projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
 
-## How can I deploy this project?
+## 📄 Licença
 
-Simply open [Lovable](https://lovable.dev/projects/dc954720-9c9d-47ee-a284-0b1c6c392748) and click on Share -> Publish.
+Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
-## Can I connect a custom domain to my Lovable project?
+## 📞 Contato
 
-Yes, you can!
+- **Email**: [seu-email@exemplo.com]
+- **LinkedIn**: [seu-linkedin]
+- **Portfolio**: [seu-portfolio]
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Desenvolvido com ❤️ para ajudar estudantes a alcançarem seus objetivos no ENEM.
