@@ -193,7 +193,7 @@ const Login = () => {
         <div className="text-center space-y-6">
           <div className="flex justify-center">
             <img 
-              src="/logo reditto.png" 
+              src="/logo.png" 
               alt="Reditto Logo" 
               className="w-48 h-48 object-contain"
             />
