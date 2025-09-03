@@ -1,0 +1,43 @@
+name: db-backup
+
+on:
+  schedule:
+    - cron: "0 2 * * *" # diariamente às 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install pg_dump
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client awscli
+
+      - name: Dump database
+        env:
+          PGHOST: ${{ secrets.PG_HOST }}
+          PGPORT: ${{ secrets.PG_PORT }}
+          PGUSER: ${{ secrets.PG_USER }}
+          PGPASSWORD: ${{ secrets.PG_PASSWORD }}
+          PGDATABASE: ${{ secrets.PG_DATABASE }}
+        run: |
+          set -euo pipefail
+          ts=$(date -u +%Y%m%dT%H%M%SZ)
+          file="backup-$ts.dump"
+          pg_dump --no-owner --format=custom -Z9 -f "$file"
+          sha256sum "$file" > "$file.sha256"
+
+      - name: Upload to S3 with SSE
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
+        run: |
+          set -euo pipefail
+          aws s3 cp backup-*.dump "s3://$S3_BUCKET/db/" --sse AES256
+          aws s3 cp backup-*.sha256 "s3://$S3_BUCKET/db/"
+
+      - name: Cleanup old local artifacts
+        run: rm -f backup-*.dump backup-*.sha256 || true
+
+

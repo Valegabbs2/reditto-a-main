@@ -7,6 +7,7 @@ import { Analytics } from '@vercel/analytics/react';
 import Login from "./pages/Login";
 import Envio from "./pages/Envio";
 import Resultados from "./pages/Resultados";
+import RequireAuth from "./components/RequireAuth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,8 +20,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
-          <Route path="/envio" element={<Envio />} />
-          <Route path="/resultados" element={<Resultados />} />
+          <Route path="/envio" element={<RequireAuth><Envio /></RequireAuth>} />
+          <Route path="/resultados" element={<RequireAuth><Resultados /></RequireAuth>} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

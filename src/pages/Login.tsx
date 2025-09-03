@@ -24,10 +24,17 @@ const Login = () => {
   const [name, setName] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const supabaseReady = Boolean(supabase);
 
   // Check authentication state
   useEffect(() => {
+    // Limpar modo visitante ao retornar ao login
+    localStorage.removeItem('isGuest');
+    
     // Set up auth state listener FIRST
+    if (!supabase) {
+      return;
+    }
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setSession(session);
@@ -56,6 +63,14 @@ const Login = () => {
   const handleGoogleAuth = async () => {
     setLoading(true);
     try {
+      if (!supabaseReady) {
+        toast({
+          variant: "destructive",
+          title: "Configuração ausente",
+          description: "Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY."
+        });
+        return;
+      }
       const redirectUrl = `${window.location.origin}/envio`;
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -87,13 +102,68 @@ const Login = () => {
     setLoading(true);
     
     try {
+      if (!supabaseReady) {
+        toast({
+          variant: "destructive",
+          title: "Configuração ausente",
+          description: "Defina VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY."
+        });
+        return;
+      }
+      // Validações básicas no cliente
+      const trimmedEmail = email.trim().toLowerCase();
+      const trimmedName = name.trim();
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+      const isValidEmail = emailRegex.test(trimmedEmail) && trimmedEmail.length >= 3 && trimmedEmail.length <= 254;
+      const isValidPassword = (() => {
+        if (typeof password !== 'string') return false;
+        if (isSignUp) {
+          if (password.length < 8 || password.length > 72) return false;
+          const hasLower = /[a-z]/.test(password);
+          const hasUpper = /[A-Z]/.test(password);
+          const hasNumber = /\d/.test(password);
+          const hasSpecial = /[^A-Za-z0-9]/.test(password);
+          return hasLower && hasUpper && hasNumber && hasSpecial;
+        }
+        // Login: aceitar qualquer senha não vazia, evitando bloquear contas antigas
+        return password.length > 0;
+      })();
+      const isValidName = !isSignUp || (trimmedName.length >= 2 && trimmedName.length <= 80);
+
+      if (!isValidEmail) {
+        toast({
+          variant: "destructive",
+          title: "Email inválido",
+          description: "Informe um email válido."
+        });
+        return;
+      }
+
+      if (!isValidPassword) {
+        toast({
+          variant: "destructive",
+          title: isSignUp ? "Senha fraca" : "Senha obrigatória",
+          description: isSignUp ? "Use 8+ caracteres com maiúscula, minúscula, número e símbolo." : "Informe sua senha."
+        });
+        return;
+      }
+
+      if (!isValidName) {
+        toast({
+          variant: "destructive",
+          title: "Nome inválido",
+          description: "O nome deve ter entre 2 e 80 caracteres."
+        });
+        return;
+      }
+
       if (isSignUp) {
         const { data, error } = await supabase.auth.signUp({
-          email,
+          email: trimmedEmail,
           password,
           options: {
             data: {
-              display_name: name
+              display_name: trimmedName
             }
           }
         });
@@ -117,7 +187,7 @@ const Login = () => {
           if (data?.user && !data?.user?.email_confirmed_at) {
             // Tentar fazer login automático
             const { error: signInError } = await supabase.auth.signInWithPassword({
-              email,
+              email: trimmedEmail,
               password
             });
             
@@ -143,7 +213,7 @@ const Login = () => {
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
-          email,
+          email: trimmedEmail,
           password
         });
 
@@ -167,7 +237,7 @@ const Login = () => {
       toast({
         variant: "destructive",
         title: "Erro",
-        description: "Algo deu errado. Tente novamente."
+        description: (error as any)?.message || "Algo deu errado. Tente novamente."
       });
     } finally {
       setLoading(false);
@@ -175,6 +245,8 @@ const Login = () => {
   };
 
   const handleDemoLogin = () => {
+    // Marcar como visitante e navegar para página especial
+    localStorage.setItem('isGuest', 'true');
     navigate("/envio");
   };
 
@@ -354,6 +426,44 @@ const Login = () => {
               >
                 {loading ? "Processando..." : (isSignUp ? "Criar conta" : "Entrar")}
               </Button>
+
+              {!isSignUp && (
+                <div className="text-center">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const trimmedEmail = email.trim().toLowerCase();
+                      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+                      if (!trimmedEmail || !emailRegex.test(trimmedEmail)) {
+                        toast({
+                          variant: "destructive",
+                          title: "Email inválido",
+                          description: "Digite um email válido para enviar o link de redefinição."
+                        });
+                        return;
+                      }
+                      try {
+                        await supabase.auth.resetPasswordForEmail(trimmedEmail, {
+                          redirectTo: `${window.location.origin}/envio`
+                        });
+                        toast({
+                          title: "Verifique seu email",
+                          description: "Enviamos um link para redefinir sua senha."
+                        });
+                      } catch (err) {
+                        toast({
+                          variant: "destructive",
+                          title: "Erro ao enviar link",
+                          description: "Tente novamente em instantes."
+                        });
+                      }
+                    }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Esqueci minha senha
+                  </button>
+                </div>
+              )}
             </form>
 
             <div className="text-center">

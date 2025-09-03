@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LogOut, FileEdit, Printer, CheckCircle, AlertTriangle, Lightbulb, Trophy } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CorrectionData {
   competencias: {
@@ -34,7 +35,7 @@ const Resultados = () => {
         const result = JSON.parse(storedResult);
         setCorrectionData(result);
       } catch (error) {
-        console.error('Erro ao recuperar dados da correção:', error);
+        console.error('Erro ao recuperar dados da correção');
       }
     }
     
@@ -65,6 +66,12 @@ const Resultados = () => {
   };
 
   const handleLogout = () => {
+    // Limpar modo visitante se existir
+    localStorage.removeItem('isGuest');
+    // Limpar sessão do Supabase se existir
+    if (supabase) {
+      supabase.auth.signOut();
+    }
     navigate("/");
   };
 

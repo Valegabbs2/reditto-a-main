@@ -57,6 +57,40 @@ O projeto está configurado para deploy automático no Vercel. Para fazer deploy
 2. Configure as variáveis de ambiente no painel do Vercel
 3. O deploy será feito automaticamente a cada push
 
+## 🛡️ Backup & Restore
+
+Rotina de backup automatizado do banco via GitHub Actions:
+
+- Workflow: `.github/workflows/db-backup.yml` (execução diária às 02:00 UTC e sob demanda)
+- Dump: `pg_dump --format=custom -Z9`
+- Armazenamento: S3 com SSE (AES256)
+
+Variáveis necessárias (GitHub Secrets):
+
+- `PG_HOST`, `PG_PORT`, `PG_USER`, `PG_PASSWORD`, `PG_DATABASE`
+- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `S3_BUCKET`
+
+RTO/RPO de referência (ajuste conforme plano):
+
+- RPO: 24h (backup diário) — menor se habilitar PITR no Supabase
+- RTO: 1–2h, dependendo do tamanho do dump
+
+Restauração (staging recomendado):
+
+1. Baixar dump do S3 e validar checksum:
+   - `sha256sum -c backup-YYYYMMDDTHHMMSSZ.dump.sha256`
+2. Restaurar em um banco novo:
+   - `pg_restore --clean --no-owner -d <DATABASE_URL> backup-YYYYMMDDTHHMMSSZ.dump`
+3. Verificar app: login, envio e correção
+4. Registrar duração (RTO) e eventuais falhas
+
+Boas práticas:
+
+- Política 3-2-1: 3 cópias, 2 mídias, 1 off-site
+- Retenção: 7/30/180 dias por camadas (configurar lifecycle no S3)
+- Acesso mínimo (IAM) e rotação de credenciais
+- Testes de restauração trimestrais
+
 ## 📁 Estrutura do Projeto
 
 ```

@@ -31,6 +31,17 @@ const Envio = () => {
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
+      // Validação de tipo e tamanho antes de processar
+      const allowedTypes = ["image/jpeg", "image/png"];
+      const maxSizeBytes = 10 * 1024 * 1024; // 10MB
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Apenas imagens JPEG ou PNG são permitidas.');
+        return;
+      }
+      if (file.size > maxSizeBytes) {
+        toast.error('Imagem muito grande. Tamanho máximo é 10MB.');
+        return;
+      }
       setSelectedImage(file);
       
       // Converter imagem para texto automaticamente
@@ -54,16 +65,17 @@ const Envio = () => {
           const base64 = e.target?.result as string;
           const imageBase64 = base64.split(',')[1]; // Remove o prefixo data:image/...;base64,
           
-          console.log('Enviando imagem para extração de texto...');
+          // log minimal
           
+          if (!supabase) throw new Error('Supabase não configurado.');
           const { data, error } = await supabase.functions.invoke('extract-text-from-image', {
             body: { imageBase64 }
           });
           
-          console.log('Resposta da função:', data, error);
+          // Evitar logar payloads; apenas status
           
           if (error) {
-            console.error('Erro da edge function:', error);
+            console.error('Erro da edge function');
             throw new Error(error.message || 'Erro ao processar imagem');
           }
           
@@ -79,7 +91,7 @@ const Envio = () => {
           
           resolve();
         } catch (error) {
-          console.error('Erro completo:', error);
+          console.error('Erro no processamento da imagem');
           reject(error);
         }
       };
@@ -93,10 +105,19 @@ const Envio = () => {
     
     setIsCorrecting(true);
     try {
+      const trimmedText = texto.trim();
+      const trimmedTema = (tema || '').trim();
+      if (trimmedText.length < 200 || trimmedText.length > 5000) {
+        throw new Error('O texto deve ter entre 200 e 5000 caracteres.');
+      }
+      if (trimmedTema.length > 200) {
+        throw new Error('O tema deve ter no máximo 200 caracteres.');
+      }
+      if (!supabase) throw new Error('Supabase não configurado.');
       const { data, error } = await supabase.functions.invoke('correct-essay', {
         body: { 
-          text: texto,
-          theme: tema || undefined
+          text: trimmedText,
+          theme: trimmedTema || undefined
         }
       });
       
@@ -107,8 +128,8 @@ const Envio = () => {
       if (data.success && data.correction) {
         // Salvar correção no localStorage para acessar na página de resultados
         localStorage.setItem('correctionResult', JSON.stringify(data.correction));
-        localStorage.setItem('submittedEssay', texto);
-        localStorage.setItem('essayTheme', tema || '');
+        localStorage.setItem('submittedEssay', trimmedText);
+        localStorage.setItem('essayTheme', trimmedTema || '');
         
         navigate("/resultados");
       } else {
@@ -137,6 +158,12 @@ const Envio = () => {
   };
 
   const handleLogout = () => {
+    // Limpar modo visitante se existir
+    localStorage.removeItem('isGuest');
+    // Limpar sessão do Supabase se existir
+    if (supabase) {
+      supabase.auth.signOut();
+    }
     navigate("/");
   };
 
